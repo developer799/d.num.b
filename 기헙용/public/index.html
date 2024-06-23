@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대기 접수</title>
+    <style>
+        body {
+            background-image: url('images/c3.png'); /* 기본 배경 이미지 */
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .phone-input {
+            font-size: 20px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: orange;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>대기 접수</h1>
+        <p>손님이 직접 휴대폰 번호를 입력하여 대기 접수합니다.</p>
+        <input type="text" id="phone" class="phone-input" placeholder="010-">
+        <button class="btn" onclick="getQueueNumber()">접수</button>
+        <p id="queue-status">현재 대기: 0팀</p>
+        <p id="error-message" class="error-message"></p>
+    </div>
+
+    <script>
+        let queueNumber = 0;
+
+        async function getQueueNumber() {
+            const phone = document.getElementById('phone').value.trim();
+            const errorMessage = document.getElementById('error-message');
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('userId');
+
+            if (!phone) {
+                errorMessage.innerText = "번호를 입력해 주세요.";
+                return;
+            }
+
+            if (!userId) {
+                errorMessage.innerText = "로그인 정보가 없습니다.";
+                return;
+            }
+
+            errorMessage.innerText = ""; // 기존 에러 메시지 제거
+
+            try {
+                const response = await fetch('/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, userId })
+                });
+                const data = await response.json();
+                queueNumber = data.id;
+
+                document.getElementById('queue-status').innerText = `현재 대기: ${queueNumber}팀`;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        window.onload = async function() {
+            try {
+                const response = await fetch('/background');
+                const data = await response.json();
+                if (data.value) {
+                    document.body.style.backgroundImage = `url('${data.value}')`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        };
+    </script>
+</body>
+</html>

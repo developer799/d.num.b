@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>배경 이미지 변경</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* 기본 배경색 설정 */
+        }
+        .container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>배경 이미지 변경</h1>
+        <input type="file" id="bg-input" accept="image/*">
+        <button onclick="changeBackground()">변경</button>
+        <button onclick="notifyNext()">다음팀</button>
+    </div>
+
+    <script>
+        async function changeBackground() {
+            const input = document.getElementById('bg-input');
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const imageUrl = e.target.result;
+                    try {
+                        await fetch('/background', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ image: imageUrl })
+                        });
+                        alert('index.html의 배경 이미지가 변경되었습니다.');
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function notifyNext() {
+            try {
+                const response = await fetch('/next', { method: 'POST' });
+                const data = await response.json();
+
+                if (data.phone) {
+                    // 카카오톡 봇을 이용한 메시지 보내기 (예시 코드)
+                    console.log(`Sending message to ${data.phone}: 입장하시면 됩니다.`);
+                } else {
+                    alert('대기 중인 팀이 없습니다.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

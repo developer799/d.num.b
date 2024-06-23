@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>카카오톡 로그인</title>
+</head>
+<body>
+    <h1>카카오톡 로그인</h1>
+    <button id="login-btn">로그인</button>
+
+    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+    <script>
+        Kakao.init('143a99a11e2dcc079217f7723f450ab2'); // 카카오 디벨로퍼스에서 발급받은 JavaScript 키를 입력하세요.
+
+        document.getElementById('login-btn').addEventListener('click', function() {
+            Kakao.Auth.authorize({
+                redirectUri: 'http://localhost:3000/oauth'
+            });
+        });
+    </script>
+</body>
+</html>
